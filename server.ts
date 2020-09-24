@@ -1,5 +1,4 @@
 import { Application } from "https://deno.land/x/oak/mod.ts";
-
 import apiRouter from "./router/router.ts";
 const app = new Application();
 
