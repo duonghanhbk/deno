@@ -1,23 +1,47 @@
-import type { Context } from "https://deno.land/x/oak/mod.ts";
+import { Context, Status, STATUS_TEXT } from "https://deno.land/x/oak/mod.ts";
 
-import Db from "../db/database.ts";
+import { Response } from "../helper/repsonse.ts";
 
-// Defining schema interface
-interface UserSchema {
-  _id: { $oid: string };
-  username: string;
-  password: string;
-}
+import { saveUser, selectUserByPhone } from "../repository/userRepo.ts";
+import { encryptPass } from "../security/pass.ts";
 
-const users = Db.collection<UserSchema>("users");
+export const signInHandler = async (context: Context) => {
+  context.response.status = Status.OK;
+  context.response.body = "SignIn";
+};
 
-export const testApiHandler = async (context: Context) => {
-  console.log(users);
-  const insertId = await users.insertOne({
-    username: "user1",
-    password: "pass1",
-  });
+export const signUpHandler = async (context: Context) => {
+  const body = context.request.body();
+  const reqData = body.value;
+  console.log("requ", context);
+  // const user = await selectUserByPhone(reqData.phone);
+  // if (user) {
+  //   return Response(
+  //     context,
+  //     Status.Conflict,
+  //     { status: Status.Conflict, message: STATUS_TEXT.get(Status.Conflict) },
+  //   );
+  // }
 
-  console.log(insertId);
-  context.response.body = "Hello !";
+  // reqData.password = encryptPass(reqData.password);
+  // const insertId = await saveUser(body.value);
+
+  // if (!insertId) {
+  //   return Response(
+  //     context,
+  //     Status.InternalServerError,
+  //     {
+  //       status: Status.InternalServerError,
+  //       message: STATUS_TEXT.get(Status.InternalServerError),
+  //     },
+  //   );
+  // }
+  return Response(
+    context,
+    Status.OK,
+    {
+      status: Status.OK,
+      message: STATUS_TEXT.get(Status.OK),
+    },
+  );
 };
