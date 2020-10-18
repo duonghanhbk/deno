@@ -1,8 +1,12 @@
-import { Context, Status, STATUS_TEXT } from "https://deno.land/x/oak/mod.ts";
+// deno-lint-ignore-file
+import { Context, Status, STATUS_TEXT, parseAndDecode } from "../deps.ts";
+import type { Payload } from "../deps.ts";
 
 import { Response } from "../helper/repsonse.ts";
+import { parseToken } from "../helper/token.ts";
 import { saveUser, selectUserByPhone } from "../repository/userRepo.ts";
 import { encryptPass, verifyPass } from "../security/pass.ts";
+import { genToken } from "../security/jwt.ts";
 
 export const signInHandler = async (context: Context) => {
   const body = context.request.body();
@@ -29,12 +33,18 @@ export const signInHandler = async (context: Context) => {
       },
     );
   }
+  const token = await genToken({ phone: user!.phone });
   return Response(
     context,
     Status.OK,
     {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
+      data: {
+        displayName: user!.displayName,
+        avatar: user!.avatar,
+        token,
+      },
     },
   );
 };
@@ -65,12 +75,45 @@ export const signUpHandler = async (context: Context) => {
       },
     );
   }
+
+  const token = await genToken({ phone: user!.phone });
   return Response(
     context,
     Status.OK,
     {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
+      data: {
+        displayName: user!.displayName,
+        avatar: user!.avatar,
+        token,
+      },
+    },
+  );
+};
+
+export const profileHandler = async (context: Context) => {
+  const token = await parseToken(context);
+  const payload: any = await parseAndDecode(token)?.payload;
+  const user = await selectUserByPhone(payload!.phone);
+  if (!user) {
+    return Response(
+      context,
+      Status.NotFound,
+      { status: Status.NotFound, message: STATUS_TEXT.get(Status.NotFound) },
+    );
+  }
+  return Response(
+    context,
+    Status.OK,
+    {
+      status: Status.OK,
+      message: STATUS_TEXT.get(Status.OK),
+      data: {
+        displayName: user!.displayName,
+        avatar: user!.avatar,
+        phone: user!.phone,
+      },
     },
   );
 };

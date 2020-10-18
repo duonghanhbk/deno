@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-import type { Context, Status } from "https://deno.land/x/oak/mod.ts";
+import type { Context, Status } from "../deps.ts";
 
 export const Response = (context: Context, status: Status, data: any) => {
   context.response.status = status;
