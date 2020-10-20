@@ -53,7 +53,6 @@ export const signUpHandler = async (context: Context) => {
   const body = context.request.body();
   const reqData = await body.value;
   const user = await selectUserByPhone(reqData.phone);
-
   if (user) {
     return Response(
       context,
@@ -61,10 +60,8 @@ export const signUpHandler = async (context: Context) => {
       { status: Status.Conflict, message: STATUS_TEXT.get(Status.Conflict) },
     );
   }
-
   reqData.password = encryptPass(reqData.password);
   const insertId = await saveUser(reqData);
-
   if (!insertId) {
     return Response(
       context,
@@ -75,8 +72,7 @@ export const signUpHandler = async (context: Context) => {
       },
     );
   }
-
-  const token = await genToken({ phone: user!.phone });
+  const token = await genToken({ phone: reqData.phone });
   return Response(
     context,
     Status.OK,
@@ -84,8 +80,8 @@ export const signUpHandler = async (context: Context) => {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
       data: {
-        displayName: user!.displayName,
-        avatar: user!.avatar,
+        displayName: reqData.displayName,
+        avatar: reqData.avatar,
         token,
       },
     },
