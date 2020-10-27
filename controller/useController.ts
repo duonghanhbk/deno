@@ -4,7 +4,7 @@ import type { Payload } from "../deps.ts";
 
 import { Response } from "../helper/repsonse.ts";
 import { parseToken } from "../helper/token.ts";
-import { saveUser, selectUserByPhone } from "../repository/userRepo.ts";
+import { saveUser, selectUserByUsername } from "../repository/userRepo.ts";
 import { encryptPass, verifyPass } from "../security/pass.ts";
 import { genToken } from "../security/jwt.ts";
 
@@ -12,7 +12,7 @@ export const signInHandler = async (context: Context) => {
   const body = context.request.body();
   const reqData = await body.value;
 
-  const user = await selectUserByPhone(reqData.phone);
+  const user = await selectUserByUsername(reqData.username);
 
   if (!user) {
     return Response(
@@ -33,7 +33,7 @@ export const signInHandler = async (context: Context) => {
       },
     );
   }
-  const token = await genToken({ phone: user!.phone });
+  const token = await genToken(user!.username);
   return Response(
     context,
     Status.OK,
@@ -41,8 +41,10 @@ export const signInHandler = async (context: Context) => {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
       data: {
+        username: user!.username,
         displayName: user!.displayName,
         avatar: user!.avatar,
+        phone: user!.phone,
         token,
       },
     },
@@ -52,7 +54,7 @@ export const signInHandler = async (context: Context) => {
 export const signUpHandler = async (context: Context) => {
   const body = context.request.body();
   const reqData = await body.value;
-  const user = await selectUserByPhone(reqData.phone);
+  const user = await selectUserByUsername(reqData.username);
   if (user) {
     return Response(
       context,
@@ -72,7 +74,7 @@ export const signUpHandler = async (context: Context) => {
       },
     );
   }
-  const token = await genToken({ phone: reqData.phone });
+  const token = await genToken(reqData.username);
   return Response(
     context,
     Status.OK,
@@ -80,8 +82,10 @@ export const signUpHandler = async (context: Context) => {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
       data: {
+        username: reqData.username,
         displayName: reqData.displayName,
         avatar: reqData.avatar,
+        phone: reqData.phone,
         token,
       },
     },
@@ -91,7 +95,7 @@ export const signUpHandler = async (context: Context) => {
 export const profileHandler = async (context: Context) => {
   const token = await parseToken(context);
   const payload: any = await parseAndDecode(token)?.payload;
-  const user = await selectUserByPhone(payload!.phone);
+  const user = await selectUserByUsername(payload!.username);
   if (!user) {
     return Response(
       context,
@@ -106,6 +110,7 @@ export const profileHandler = async (context: Context) => {
       status: Status.OK,
       message: STATUS_TEXT.get(Status.OK),
       data: {
+        username: user!.username,
         displayName: user!.displayName,
         avatar: user!.avatar,
         phone: user!.phone,
