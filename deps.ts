@@ -1,6 +1,8 @@
+export { Application } from "https://deno.land/x/oak/mod.ts";
 export { Context, Status, STATUS_TEXT } from "https://deno.land/x/oak/mod.ts";
 export { MongoClient } from "https://deno.land/x/mongo@v0.11.1/mod.ts";
 export { Router } from "https://deno.land/x/oak/mod.ts";
+export { oakCors } from "https://deno.land/x/cors/mod.ts";
 export {
   validateJwt,
   isObject,

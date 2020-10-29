@@ -38,14 +38,19 @@ export const signInHandler = async (context: Context) => {
     context,
     Status.OK,
     {
-      status: Status.OK,
-      message: STATUS_TEXT.get(Status.OK),
+      meta: {
+        code: Status.OK,
+        message: STATUS_TEXT.get(Status.OK),
+      },
       data: {
         username: user!.username,
         displayName: user!.displayName,
         avatar: user!.avatar,
         phone: user!.phone,
-        token,
+        access_token: token,
+        expires_at: 1635478382,
+        refresh_token: "",
+        token_type: "Bearer",
       },
     },
   );
@@ -114,6 +119,29 @@ export const profileHandler = async (context: Context) => {
         displayName: user!.displayName,
         avatar: user!.avatar,
         phone: user!.phone,
+      },
+    },
+  );
+};
+
+export const signOut = async (context: Context) => {
+  const token = await parseToken(context);
+  const payload: any = await parseAndDecode(token)?.payload;
+  const user = await selectUserByUsername(payload!.username);
+  if (!user) {
+    return Response(
+      context,
+      Status.NotFound,
+      { status: Status.NotFound, message: STATUS_TEXT.get(Status.NotFound) },
+    );
+  }
+  return Response(
+    context,
+    Status.OK,
+    {
+      meta: {
+        code: Status.OK,
+        message: STATUS_TEXT.get(Status.OK),
       },
     },
   );
