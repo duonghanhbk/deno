@@ -1,6 +1,5 @@
 // deno-lint-ignore-file
 import { Context, Status, STATUS_TEXT, parseAndDecode } from "../deps.ts";
-import type { Payload } from "../deps.ts";
 
 import { Response } from "../helper/repsonse.ts";
 import { parseToken } from "../helper/token.ts";
@@ -84,14 +83,19 @@ export const signUpHandler = async (context: Context) => {
     context,
     Status.OK,
     {
-      status: Status.OK,
-      message: STATUS_TEXT.get(Status.OK),
+      meta: {
+        code: Status.OK,
+        message: STATUS_TEXT.get(Status.OK),
+      },
       data: {
         username: reqData.username,
         displayName: reqData.displayName,
         avatar: reqData.avatar,
         phone: reqData.phone,
-        token,
+        access_token: token,
+        expires_at: 1635478382,
+        refresh_token: "",
+        token_type: "Bearer",
       },
     },
   );

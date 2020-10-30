@@ -1,2 +1,2 @@
 run:
-	deno run --allow-net --allow-write --allow-read --allow-plugin --unstable server.ts
+	deno run --allow-net --allow-env --allow-write --allow-read --allow-plugin --no-check --unstable server.ts
