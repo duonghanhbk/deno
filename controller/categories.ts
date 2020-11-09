@@ -122,7 +122,7 @@ export const getDetailCategoryHandler = async (context: Context) => {
     );
   }
 
-  const id: number = context.params.id;
+  const { id } = helpers.getQuery(context, { mergeParams: true });
 
   const category = await getDetailCategory(+id);
 
