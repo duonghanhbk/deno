@@ -1,6 +1,6 @@
 import type { Context } from "../deps.ts";
 
-export const parseToken = async (context: Context) => {
+export const parseToken = (context: Context) => {
   const headers: Headers = context.request.headers;
   const authorization = headers.get("Authorization");
 
