@@ -6,6 +6,8 @@ export {
   Status,
   STATUS_TEXT,
 } from "https://deno.land/x/oak/mod.ts";
+
+export * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 // export { Context, Status, STATUS_TEXT } from "https://deno.land/x/oak/mod.ts";
 export { MongoClient } from "https://deno.land/x/mongo@v0.13.0/mod.ts";
 // export { helpers, Router } from "https://deno.land/x/oak/mod.ts";

@@ -1,4 +1,4 @@
-import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { bcrypt } from "../deps.ts";
 
 export const encryptPass = (stringToHash: string) => {
   return bcrypt.hashSync(stringToHash);

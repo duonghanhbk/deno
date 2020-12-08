@@ -11,10 +11,12 @@ import { Response } from "../helper/repsonse.ts";
 import { parseToken } from "../helper/token.ts";
 import { selectUserByUsername } from "../repository/userRepo.ts";
 import {
+  deleteCategory,
   getDetailCategory,
   getListCategories,
   saveCategory,
   totalCategories,
+  updateCategory,
 } from "../repository/categories.ts";
 
 export const createCategoryHandler = async (context: Context) => {
@@ -54,6 +56,90 @@ export const createCategoryHandler = async (context: Context) => {
       },
       data: {
         ...reqData,
+      },
+    },
+  );
+};
+
+export const updateCategoryHandler = async (context: Context) => {
+  const token = await parseToken(context);
+  const payload: any = await parseAndDecode(token)?.payload;
+  const user = await selectUserByUsername(payload!.username);
+  if (!user) {
+    return Response(
+      context,
+      Status.NotFound,
+      { status: Status.NotFound, message: STATUS_TEXT.get(Status.NotFound) },
+    );
+  }
+
+  const { id } = helpers.getQuery(context, { mergeParams: true });
+
+  const body = context.request.body();
+  const reqData = await body.value;
+  const data = { ...reqData, id };
+  const { matchedCount, modifiedCount } = await updateCategory(+id, data);
+
+  if (!matchedCount || !modifiedCount) {
+    return Response(
+      context,
+      Status.InternalServerError,
+      {
+        status: Status.InternalServerError,
+        message: STATUS_TEXT.get(Status.InternalServerError),
+      },
+    );
+  }
+
+  return Response(
+    context,
+    Status.OK,
+    {
+      meta: {
+        code: Status.OK,
+        message: STATUS_TEXT.get(Status.OK),
+      },
+      data: {
+        ...data,
+      },
+    },
+  );
+};
+
+export const deleteCategoryHandler = async (context: Context) => {
+  const token = await parseToken(context);
+  const payload: any = await parseAndDecode(token)?.payload;
+  const user = await selectUserByUsername(payload!.username);
+  if (!user) {
+    return Response(
+      context,
+      Status.NotFound,
+      { status: Status.NotFound, message: STATUS_TEXT.get(Status.NotFound) },
+    );
+  }
+
+  const { id } = helpers.getQuery(context, { mergeParams: true });
+
+  const deleteCount = await deleteCategory(+id);
+
+  if (!deleteCount) {
+    return Response(
+      context,
+      Status.InternalServerError,
+      {
+        status: Status.InternalServerError,
+        message: STATUS_TEXT.get(Status.InternalServerError),
+      },
+    );
+  }
+
+  return Response(
+    context,
+    Status.OK,
+    {
+      meta: {
+        code: Status.OK,
+        message: STATUS_TEXT.get(Status.OK),
       },
     },
   );
